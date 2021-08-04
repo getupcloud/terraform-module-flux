@@ -22,6 +22,12 @@ variable "git_repository_template" {
   default     = "flux-git-repository.yaml.tpl"
 }
 
+variable "git_repository_name" {
+  description = "Name for GitRepository object"
+  type        = string
+  default     = "cluster"
+}
+
 variable "manifests_path" {
   description = "Manifests dir inside GitRepository"
   type        = string

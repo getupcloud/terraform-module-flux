@@ -33,14 +33,14 @@ resource "kubectl_manifest" "flux" {
 
 locals {
   template_vars = {
-    name               = "flux"
-    namespace          = var.namespace
-    git_repo           = var.git_repo
-    manifests_path     = var.manifests_path
-    reconcile_interval = var.reconcile_interval
-    identity           = trimspace(file(abspath(pathexpand(var.identity_file))))
-    identity_pub       = trimspace(file(abspath(pathexpand(var.identity_pub_file))))
-    known_hosts        = trimspace(file(abspath(pathexpand(var.known_hosts_file))))
+    git_repository_name = var.git_repository_name
+    namespace           = var.namespace
+    git_repo            = var.git_repo
+    manifests_path      = var.manifests_path
+    reconcile_interval  = var.reconcile_interval
+    identity            = trimspace(file(abspath(pathexpand(var.identity_file))))
+    identity_pub        = trimspace(file(abspath(pathexpand(var.identity_pub_file))))
+    known_hosts         = trimspace(file(abspath(pathexpand(var.known_hosts_file))))
   }
 
   git_repository_template = var.git_repo == "" ? "" : abspath(pathexpand(var.git_repository_template))
