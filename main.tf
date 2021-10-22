@@ -55,11 +55,11 @@ data "kubectl_file_documents" "flux-git-repository" {
 
 resource "kubectl_manifest" "flux-git-repository" {
   depends_on = [kubectl_manifest.flux]
-  for_each   = {
-    for i in [ for j in data.kubectl_file_documents.flux-git-repository.documents : yamldecode(j) ] :
-      "${i.kind}_${try(format("%s_", i.metadata.namespace), "")}${i.metadata.name}" => i
-    }
-  yaml_body  = yamlencode(each.value)
-  wait_for_rollout   = var.wait
-  wait               = var.wait
+  for_each = {
+    for i in [for j in data.kubectl_file_documents.flux-git-repository.documents : yamldecode(j)] :
+    "${i.kind}_${try(format("%s_", i.metadata.namespace), "")}${i.metadata.name}" => i
+  }
+  yaml_body        = yamlencode(each.value)
+  wait_for_rollout = var.wait
+  wait             = var.wait
 }

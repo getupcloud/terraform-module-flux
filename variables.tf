@@ -36,7 +36,7 @@ variable "manifests_path" {
 
 variable "wait" {
   description = "Wait for all manifests to apply"
-  type        = boolean
+  type        = bool
   default     = true
 }
 
