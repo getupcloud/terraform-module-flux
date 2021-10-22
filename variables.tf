@@ -34,6 +34,12 @@ variable "manifests_path" {
   default     = ""
 }
 
+variable "wait" {
+  description = "Wait for all manifests to apply"
+  type        = boolean
+  default     = true
+}
+
 variable "reconcile_interval" {
   description = "Reconcile interval for GitRepository"
   type        = string

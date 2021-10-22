@@ -25,6 +25,8 @@ resource "kubectl_manifest" "flux" {
   for_each           = { for i in local.manifests : "${i.kind}_${try(format("%s_", i.metadata.namespace), "")}${i.metadata.name}" => i if i.kind != "Namespace" }
   override_namespace = kubectl_manifest.flux-namespace.name
   yaml_body          = yamlencode(each.value)
+  wait_for_rollout   = var.wait
+  wait               = var.wait
 }
 
 ###
@@ -58,4 +60,6 @@ resource "kubectl_manifest" "flux-git-repository" {
       "${i.kind}_${try(format("%s_", i.metadata.namespace), "")}${i.metadata.name}" => i
     }
   yaml_body  = yamlencode(each.value)
+  wait_for_rollout   = var.wait
+  wait               = var.wait
 }
