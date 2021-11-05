@@ -34,7 +34,7 @@ resource "kubectl_manifest" "flux" {
 ###
 
 locals {
-  template_vars = {
+  flux_template_vars = {
     git_repository_name = var.git_repository_name
     namespace           = var.namespace
     git_repo            = var.git_repo
@@ -46,7 +46,7 @@ locals {
   }
 
   git_repository_template = var.git_repo == "" ? "" : abspath(pathexpand(var.git_repository_template))
-  git_repository_data     = var.git_repo == "" ? "" : templatefile(local.git_repository_template, local.template_vars)
+  git_repository_data     = var.git_repo == "" ? "" : templatefile(local.git_repository_template, local.flux_template_vars)
 }
 
 data "kubectl_file_documents" "flux-git-repository" {
@@ -71,7 +71,7 @@ resource "kubectl_manifest" "flux-git-repository" {
 resource "local_file" "cluster-manifests" {
   for_each = {
     for tpl in fileset("${path.root}/manifests", "**")
-      : tpl => templatefile("${path.root}/manifests/${tpl}", var.template_vars)
+      : tpl => templatefile("${path.root}/manifests/${tpl}", var.cluster_template_vars)
       if substr(tpl, -4, -1) == ".tpl"
     }
   filename = trimsuffix("${path.root}/manifests/${each.key}", ".tpl")
