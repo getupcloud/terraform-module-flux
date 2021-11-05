@@ -63,3 +63,13 @@ resource "kubectl_manifest" "flux-git-repository" {
   wait_for_rollout = var.wait
   wait             = var.wait
 }
+
+###
+### Cluster Manifests
+###
+
+resource "local_file" "cluster-manifests" {
+  for_each = { for tpl in fileset("cluster/", "**.tpl") : tpl => templatefile(tpl, {}) }
+  filename = substr(each.key, 0, -4)
+  content  = each.value
+}
