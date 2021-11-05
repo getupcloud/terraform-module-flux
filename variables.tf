@@ -63,3 +63,9 @@ variable "known_hosts_file" {
   type        = string
   default     = "known_hosts"
 }
+
+variable "template_vars" {
+  description = "Variables to replace on .tpl files from {path.root}/manifests/"
+  type        = any
+  default     = {}
+}
