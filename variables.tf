@@ -64,8 +64,8 @@ variable "known_hosts_file" {
   default     = "known_hosts"
 }
 
-variable "cluster_template_vars" {
-  description = "Variables to replace on .tpl files from {path.root}/manifests/"
+variable "manifests_template_vars" {
+  description = "Template vars for use by cluster manifests"
   type        = any
   default     = {}
 }

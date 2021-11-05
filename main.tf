@@ -71,7 +71,7 @@ resource "kubectl_manifest" "flux-git-repository" {
 resource "local_file" "cluster-manifests" {
   for_each = {
     for tpl in fileset("${path.root}/manifests", "**")
-      : tpl => templatefile("${path.root}/manifests/${tpl}", var.cluster_template_vars)
+      : tpl => templatefile("${path.root}/manifests/${tpl}", var.manifests_template_vars)
       if substr(tpl, -4, -1) == ".tpl"
     }
   filename = trimsuffix("${path.root}/manifests/${each.key}", ".tpl")
