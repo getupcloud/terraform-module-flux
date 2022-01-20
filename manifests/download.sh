@@ -12,7 +12,7 @@ download_release()
   fi
 
   echo Downloading release $tag_name from $url
-  curl -s -L -o install-${tag_name}.yaml $url
+  curl -s -L $url | yq --no-colors e . - > install-${tag_name}.yaml
 }
 
 if [ $# -eq 0 ]; then
