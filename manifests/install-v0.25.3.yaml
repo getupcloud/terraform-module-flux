@@ -4633,6 +4633,9 @@ spec:
       volumes:
         - emptyDir: {}
           name: temp
+      securityContext:
+        runAsUser: 100
+        runAsGroup: 101
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -4700,6 +4703,8 @@ spec:
               name: temp
       securityContext:
         fsGroup: 1337
+        runAsUser: 100
+        runAsGroup: 101
       serviceAccountName: image-automation-controller
       terminationGracePeriodSeconds: 10
       volumes:
@@ -4774,6 +4779,8 @@ spec:
               name: data
       securityContext:
         fsGroup: 1337
+        runAsUser: 100
+        runAsGroup: 101
       serviceAccountName: image-reflector-controller
       terminationGracePeriodSeconds: 10
       volumes:
@@ -4848,6 +4855,8 @@ spec:
               name: temp
       securityContext:
         fsGroup: 1337
+        runAsUser: 100
+        runAsGroup: 101
       serviceAccountName: kustomize-controller
       terminationGracePeriodSeconds: 60
       volumes:
@@ -4926,6 +4935,9 @@ spec:
       volumes:
         - emptyDir: {}
           name: temp
+      securityContext:
+        runAsUser: 100
+        runAsGroup: 101
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -5000,6 +5012,8 @@ spec:
               name: tmp
       securityContext:
         fsGroup: 1337
+        runAsUser: 100
+        runAsGroup: 101
       serviceAccountName: source-controller
       terminationGracePeriodSeconds: 10
       volumes:
