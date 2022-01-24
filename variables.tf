@@ -67,5 +67,8 @@ variable "known_hosts_file" {
 variable "manifests_template_vars" {
   description = "Template vars for use by cluster manifests"
   type        = any
-  default     = {}
+  default     = {
+    alertmanager_pagerduty_key: ""
+    alertmanager_opsgenie_api_key: ""
+  }
 }
