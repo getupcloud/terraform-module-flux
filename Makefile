@@ -7,5 +7,4 @@ v validate:
 	terraform validate
 
 f fmt:
-	terraform fmt -recursive
-
+	terraform fmt
