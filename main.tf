@@ -3,6 +3,10 @@
 ###
 
 resource "kubectl_manifest" "flux-namespace" {
+  lifecycle {
+    ignore_changes = [yaml_incluster]
+  }
+
   yaml_body = <<-EOF
     apiVersion: v1
     kind: Namespace
@@ -27,6 +31,10 @@ resource "kubectl_manifest" "flux" {
   yaml_body          = yamlencode(each.value)
   wait_for_rollout   = var.wait
   wait               = var.wait
+
+  lifecycle {
+    ignore_changes = [yaml_incluster]
+  }
 }
 
 ###
@@ -62,6 +70,10 @@ resource "kubectl_manifest" "flux-git-repository" {
   yaml_body        = yamlencode(each.value)
   wait_for_rollout = var.wait
   wait             = var.wait
+
+  lifecycle {
+    ignore_changes = [yaml_incluster]
+  }
 }
 
 ###
