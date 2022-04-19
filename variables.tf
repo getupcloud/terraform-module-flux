@@ -16,6 +16,12 @@ variable "git_repo" {
   default     = ""
 }
 
+variable "git_branch" {
+  description = "Git repository branch."
+  type        = string
+  default     = "main"
+}
+
 variable "git_repository_template" {
   description = "GitRepository template file."
   type        = string
@@ -26,6 +32,12 @@ variable "git_repository_name" {
   description = "Name for GitRepository object"
   type        = string
   default     = "cluster"
+}
+
+variable "flux_template_vars" {
+  description = "Template vars for use by flux bootstrap manifests"
+  type        = any
+  default     = {}
 }
 
 variable "manifests_path" {
