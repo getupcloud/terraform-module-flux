@@ -52,7 +52,10 @@ locals {
     identity            = trimspace(file(abspath(pathexpand(var.identity_file))))
     identity_pub        = trimspace(file(abspath(pathexpand(var.identity_pub_file))))
     known_hosts         = trimspace(file(abspath(pathexpand(var.known_hosts_file))))
-  }, var.flux_template_vars)
+  },
+  {
+    provider = var.flux_template_vars
+  })
 
   git_repository_template = var.git_repo == "" ? "" : abspath(pathexpand(var.git_repository_template))
   git_repository_data     = var.git_repo == "" ? "" : templatefile(local.git_repository_template, local.flux_template_vars)
