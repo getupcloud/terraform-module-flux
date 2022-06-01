@@ -84,3 +84,9 @@ variable "manifests_template_vars" {
     alertmanager_opsgenie_api_key : ""
   }
 }
+
+variable "install_on_okd" {
+  description = "Apply all required patches to install on OKD (Openshift)"
+  type        = bool
+  default     = false
+}

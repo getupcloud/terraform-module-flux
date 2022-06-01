@@ -17,12 +17,42 @@ resource "kubectl_manifest" "flux-namespace" {
   EOF
 }
 
-data "kubectl_file_documents" "flux-manifests" {
-  content = file(abspath(pathexpand("${path.module}/manifests/install-${var.flux_version}.yaml")))
+# Reference: https://github.com/fluxcd/website/blob/main/content/en/docs/use-cases/openshift.md
+data "kustomization_overlay" "flux-manifests" {
+  resources = [
+    abspath(pathexpand("${path.module}/manifests/install-${var.flux_version}.yaml"))
+  ]
+
+  dynamic "patches" {
+    for_each = var.install_on_okd ? ["okd"] : []
+
+    content {
+      target = {
+        kind           = "Deployment"
+        label_selector = "app.kubernetes.io/part-of=flux"
+      }
+
+      patch = <<-EOF
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: all
+        spec:
+          template:
+            spec:
+              containers:
+                - name: manager
+                  securityContext:
+                    runAsUser: 65534
+                    seccompProfile:
+                      $patch: delete
+      EOF
+    }
+  }
 }
 
 locals {
-  manifests = [for i in data.kubectl_file_documents.flux-manifests.documents : yamldecode(i)]
+  manifests = [for i in data.kustomization_overlay.flux-manifests.manifests : yamldecode(i)]
 }
 
 resource "kubectl_manifest" "flux" {
@@ -52,9 +82,9 @@ locals {
     identity            = trimspace(file(abspath(pathexpand(var.identity_file))))
     identity_pub        = trimspace(file(abspath(pathexpand(var.identity_pub_file))))
     known_hosts         = trimspace(file(abspath(pathexpand(var.known_hosts_file))))
-  },
-  {
-    provider = var.flux_template_vars
+    },
+    {
+      provider = var.flux_template_vars
   })
 
   git_repository_template = var.git_repo == "" ? "" : abspath(pathexpand(var.git_repository_template))

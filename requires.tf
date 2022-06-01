@@ -4,5 +4,14 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = "~> 1"
     }
+
+    kustomization = {
+      source  = "kbst/kustomization"
+      version = "< 1"
+    }
   }
+}
+
+provider "kustomization" {
+  kubeconfig_raw = ""
 }
