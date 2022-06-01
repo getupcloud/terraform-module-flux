@@ -17,12 +17,14 @@ resource "kubectl_manifest" "flux-namespace" {
   EOF
 }
 
-# Reference: https://github.com/fluxcd/website/blob/main/content/en/docs/use-cases/openshift.md
 data "kustomization_overlay" "flux-manifests" {
-  resources = [
-    abspath(pathexpand("${path.module}/manifests/install-${var.flux_version}.yaml"))
-  ]
+  resources = compact([
+    abspath(pathexpand("${path.module}/manifests/install-${var.flux_version}.yaml")),
+    var.install_on_okd ? abspath(pathexpand("${path.module}/manifests/okd-manifests.yaml")) : ""
+  ])
 
+  # Update Flux manifests so pods can run on Openshift
+  # Reference: https://github.com/fluxcd/website/blob/main/content/en/docs/use-cases/openshift.md
   dynamic "patches" {
     for_each = var.install_on_okd ? ["okd"] : []
 
