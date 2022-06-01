@@ -27,7 +27,7 @@ data "kustomization_overlay" "flux-manifests" {
     for_each = var.install_on_okd ? ["okd"] : []
 
     content {
-      target = {
+      target {
         kind           = "Deployment"
         label_selector = "app.kubernetes.io/part-of=flux"
       }
