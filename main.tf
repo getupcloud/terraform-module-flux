@@ -74,16 +74,17 @@ resource "kubectl_manifest" "flux" {
 ###
 
 locals {
-  flux_template_vars = merge({
-    git_repository_name = var.git_repository_name
-    namespace           = var.namespace
-    git_repo            = var.git_repo
-    git_branch          = var.git_branch
-    manifests_path      = var.manifests_path
-    reconcile_interval  = var.reconcile_interval
-    identity            = trimspace(file(abspath(pathexpand(var.identity_file))))
-    identity_pub        = trimspace(file(abspath(pathexpand(var.identity_pub_file))))
-    known_hosts         = trimspace(file(abspath(pathexpand(var.known_hosts_file))))
+  flux_template_vars = merge(
+    {
+      git_repository_name = var.git_repository_name
+      namespace           = var.namespace
+      git_repo            = var.git_repo
+      git_branch          = var.git_branch
+      manifests_path      = var.manifests_path
+      reconcile_interval  = var.reconcile_interval
+      identity            = trimspace(file(abspath(pathexpand(var.identity_file))))
+      identity_pub        = trimspace(file(abspath(pathexpand(var.identity_pub_file))))
+      known_hosts         = trimspace(file(abspath(pathexpand(var.known_hosts_file))))
     },
     {
       provider = var.flux_template_vars
