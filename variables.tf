@@ -81,7 +81,7 @@ variable "manifests_template_vars" {
   type        = any
   default = {
     alertmanager_pagerduty_key : ""
-    alertmanager_opsgenie_api_key : ""
+    alertmanager_opsgenie_integration_api_key : ""
   }
 }
 
