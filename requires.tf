@@ -11,7 +11,3 @@ terraform {
     }
   }
 }
-
-provider "kustomization" {
-  kubeconfig_raw = ""
-}
