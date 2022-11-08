@@ -79,7 +79,7 @@ locals {
   }, var.manifests_template_vars)
 
   git_repository_template = var.git_repo == "" ? "" : abspath(pathexpand(var.git_repository_template))
-  git_repository_data     = var.git_repo == "" ? "" : templatefile(local.git_repository_template, var.manifests_template_vars)
+  git_repository_data     = var.git_repo == "" ? "" : templatefile(local.git_repository_template, local.manifests_template_vars)
 }
 
 data "kubectl_file_documents" "flux-git-repository" {
