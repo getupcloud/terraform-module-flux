@@ -34,12 +34,6 @@ variable "git_repository_name" {
   default     = "cluster"
 }
 
-variable "flux_template_vars" {
-  description = "Template vars for use by flux bootstrap manifests"
-  type        = any
-  default     = {}
-}
-
 variable "manifests_path" {
   description = "Manifests dir inside GitRepository"
   type        = string
