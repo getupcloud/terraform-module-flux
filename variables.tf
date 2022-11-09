@@ -84,3 +84,9 @@ variable "install_on_okd" {
   type        = bool
   default     = false
 }
+
+variable "debug" {
+  description = "Dump debug info to file .debug-flux.json"
+  type        = bool
+  default     = false
+}
