@@ -1,9 +1,24 @@
-VERSION:=2.0-alpha4
+VERSION_TXT    := version.txt
+FILE_VERSION   := $(shell cat $(VERSION_TXT))
+VERSION        ?= $(FILE_VERSION)
+RELEASE        := v$(VERSION)
+SEMVER_REGEX   := ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+[0-9A-Za-z-]+)?$
 
-test: fmt init validate
+test: fmt lint init validate
 
 i init:
 	terraform init
+
+l lint:
+	@if type tflint &>/dev/null; then \
+		find -type f -name \*.tf |grep -v '^\./\.' |xargs -L1 dirname|sort -u| xargs -L1 tflint; \
+	else\
+		echo "Ignoring not found: tflint"; \
+	fi
+	@if ! [[ "$(VERSION)" =~ $(SEMVER_REGEX) ]]; then \
+		echo Invalid semantic version: $(VERSION) >&2; \
+		exit 1; \
+	fi
 
 v validate:
 	terraform validate
@@ -11,19 +26,14 @@ v validate:
 f fmt:
 	terraform fmt
 
-p plan:
-	[ -e identity ] || ssh-keygen -t ecdsa -b 521 -N "" -C "test-key" -f identity
-	[ -e known_hosts ] || touch known_hosts
-	terraform plan $(PLAN_OPTIONS)
-
 release:
-	@if [ $$(git status --short | wc -l) -gt 0 ]; then \
+	@if git status --porcelain | grep '^[^?]' | grep -vq $(VERSION_TXT); then \
 		git status; \
-		echo ; \
-		echo "Tree is not clean. Please commit and try again"; \
+		echo -e "\n>>> Tree is not clean. Please commit and try again <<<\n"; \
 		exit 1; \
 	fi
 	git pull --tags
-	git tag v$(VERSION)
+	git commit -m "Built release $(RELEASE)" $(VERSION_TXT)
+	git tag $(RELEASE)
 	git push --tags
 	git push

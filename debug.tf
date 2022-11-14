@@ -17,7 +17,6 @@ resource "local_file" "debug-flux" {
       identity : trimspace(file(abspath(pathexpand(var.identity_file))))
       identity_pub : trimspace(file(abspath(pathexpand(var.identity_pub_file))))
       known_hosts : trimspace(file(abspath(pathexpand(var.known_hosts_file))))
-
     }
     manifests_template_vars : local.manifests_template_vars
   })
