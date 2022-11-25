@@ -90,3 +90,16 @@ variable "debug" {
   type        = bool
   default     = false
 }
+
+variable "secret_manager" {
+  description = "Secret manager configs"
+  type = object({
+    name = string
+    kms  = any
+  })
+
+  default = {
+    name = "none"
+    kms  = null
+  }
+}
