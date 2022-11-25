@@ -94,12 +94,12 @@ variable "debug" {
 variable "secret_manager" {
   description = "Secret manager configs"
   type = object({
-    name = string
-    kms  = any
+    name   = string
+    config = any
   })
 
   default = {
-    name = "none"
-    kms  = null
+    name   = "none"
+    config = null
   }
 }

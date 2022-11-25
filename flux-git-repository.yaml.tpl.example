@@ -37,14 +37,3 @@ spec:
   sourceRef:
     kind: GitRepository
     name: ${ git_repository_name }
-
-%{ if try(modules_output.kms.enabled, false) }
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kustomize-controller
-  namespace: ${ namespace }
-  annotations:
-    eks.amazonaws.com/role-arn: ${ modules_output.kms.iam_role_arn }
-%{ endif }

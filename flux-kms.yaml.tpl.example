@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kustomize-controller
-  namespace: ${ namespace }
-  annotations:
-    eks.amazonaws.com/role-arn: ${ secret_manager.kms.output.iam_role_arn }
-    kms-key-id: ${ secret_manager.kms.key_id }
