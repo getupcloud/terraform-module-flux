@@ -19,6 +19,39 @@ data "kustomization_overlay" "flux-manifests" {
     var.install_on_okd ? abspath(pathexpand("${path.module}/manifests/okd-manifests.yaml")) : ""
   ])
 
+  patches {
+    target {
+      kind           = "Deployment"
+      label_selector = "control-plane=controller"
+    }
+
+    patch = <<-EOF
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: all
+      spec:
+        template:
+          spec:
+            tolerations:
+            - operator: Exists
+              effect: NoSchedule
+
+            affinity:
+              nodeAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  preference:
+                    matchExpressions:
+                    - key: node-role.kubernetes.io/infra
+                      operator: Exists
+                    - key: role
+                      operator: In
+                      values:
+                      - infra
+    EOF
+  }
+
   # Update Flux manifests so pods can run on Openshift
   # Reference: https://github.com/fluxcd/website/blob/main/content/en/docs/use-cases/openshift.md
   dynamic "patches" {
