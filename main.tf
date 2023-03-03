@@ -55,6 +55,20 @@ data "kustomization_overlay" "flux-manifests" {
     EOF
   }
 
+  dynamic "patches" {
+    for_each = var.secret_manager.name != "none" ? [var.secret_manager.name] : []
+
+    content {
+      target {
+        kind      = "ServiceAccount"
+        name      = "kustomize-controller"
+        namespace = var.namespace
+      }
+
+      patch = data.kubectl_file_documents.secret-manager[0].documents[0]
+    }
+  }
+
   # Update Flux manifests so pods can run on Openshift
   # Reference: https://github.com/fluxcd/website/blob/main/content/en/docs/use-cases/openshift.md
   dynamic "patches" {
