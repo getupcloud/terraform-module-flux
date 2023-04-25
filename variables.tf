@@ -1,7 +1,13 @@
 variable "flux_version" {
   description = "Flux version to install"
   type        = string
-  default     = "v0.28.4"
+  default     = "v0.35.0"
+}
+
+variable "flux_install_file" {
+  description = "Use this file to install flux instead default files. Using this options will ignore var.flux_version"
+  type        = string
+  default     = ""
 }
 
 variable "namespace" {

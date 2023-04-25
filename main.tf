@@ -15,7 +15,7 @@ resource "kubectl_manifest" "flux-namespace" {
 
 data "kustomization_overlay" "flux-manifests" {
   resources = compact([
-    abspath(pathexpand("${path.module}/manifests/install-${var.flux_version}.yaml")),
+    abspath(pathexpand(var.flux_install_file != "" ? var.flux_install_file : "${path.module}/manifests/install-${var.flux_version}.yaml")),
     var.install_on_okd ? abspath(pathexpand("${path.module}/manifests/okd-manifests.yaml")) : ""
   ])
 
