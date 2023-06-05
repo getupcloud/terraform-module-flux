@@ -34,7 +34,8 @@ data "kustomization_overlay" "flux-manifests" {
         template:
           spec:
             tolerations:
-            - operator: Exists
+            - key: dedicated
+              value: infra
               effect: NoSchedule
 
             affinity:
@@ -45,7 +46,7 @@ data "kustomization_overlay" "flux-manifests" {
                     matchExpressions:
                     - key: node-role.kubernetes.io/infra
                       operator: Exists
-                - weight: 100
+                - weight: 90
                   preference:
                     matchExpressions:
                     - key: role
