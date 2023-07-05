@@ -1,7 +1,7 @@
 variable "flux_version" {
   description = "Flux version to install"
   type        = string
-  default     = "v0.35.0"
+  default     = "v0.41.2"
 }
 
 variable "flux_install_file" {
