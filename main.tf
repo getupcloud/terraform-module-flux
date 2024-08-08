@@ -152,12 +152,20 @@ resource "kubectl_manifest" "flux-git-repository" {
 ### Cluster Manifests
 ###
 
+locals {
+  exclude_set =  fileexists("${path.root}/manifests/exclude-templates.yaml") ? flatten([
+    for i in yamldecode(file("${path.root}/manifests/exclude-templates.yaml"))
+    : fileset("${path.root}/manifests/", i)
+  ]) : []
+}
+
 resource "local_file" "cluster-manifests" {
   for_each = {
     for tpl in fileset("${path.root}/manifests", "**")
     : tpl => templatefile("${path.root}/manifests/${tpl}", var.manifests_template_vars)
-    if substr(tpl, -4, -1) == ".tpl"
+    if (endswith(tpl, ".tpl") && ! contains(local.exclude_set, tpl))
   }
   filename = trimsuffix("${path.root}/manifests/${each.key}", ".tpl")
   content  = each.value
 }
+
