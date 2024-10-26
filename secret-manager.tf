@@ -8,14 +8,6 @@ locals {
   )
 }
 
-data "kubectl_file_documents" "secret-manager" {
-  count   = var.secret_manager.name != "none" ? 1 : 0
-  content = templatefile(local.secret_manager_template_file, local.secret_manager_template_vars)
-}
-
-resource "kubectl_manifest" "secret-manager" {
-  count            = var.secret_manager.name != "none" ? 1 : 0
-  yaml_body        = data.kubectl_file_documents.secret-manager[0].documents[0]
-  wait_for_rollout = var.wait
-  wait             = var.wait
+locals {
+  secret_manager_patch = var.secret_manager.name != "none" ? templatefile(local.secret_manager_template_file, local.secret_manager_template_vars) : ""
 }

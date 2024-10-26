@@ -2,15 +2,13 @@
 ### Install flux
 ###
 
-resource "kubectl_manifest" "flux-namespace" {
-  yaml_body = <<-EOF
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      labels:
-        app.kubernetes.io/instance: flux-system
-      name: ${var.namespace}
-  EOF
+resource "kubernetes_namespace_v1" "flux-namespace" {
+  metadata {
+    name = var.namespace
+    labels = {
+      "app.kubernetes.io/instance" = "flux-system"
+    }
+  }
 }
 
 data "kustomization_overlay" "flux-manifests" {
@@ -18,6 +16,8 @@ data "kustomization_overlay" "flux-manifests" {
     abspath(pathexpand(var.flux_install_file != "" ? var.flux_install_file : "${path.module}/manifests/install-${var.flux_version}.yaml")),
     var.install_on_okd ? abspath(pathexpand("${path.module}/manifests/okd-manifests.yaml")) : ""
   ])
+
+  namespace = kubernetes_namespace_v1.flux-namespace.metadata[0].name
 
   patches {
     target {
@@ -66,7 +66,7 @@ data "kustomization_overlay" "flux-manifests" {
         namespace = var.namespace
       }
 
-      patch = data.kubectl_file_documents.secret-manager[0].documents[0]
+      patch = local.secret_manager_patch
     }
   }
 
@@ -101,15 +101,22 @@ data "kustomization_overlay" "flux-manifests" {
 }
 
 locals {
-  manifests = [for i in data.kustomization_overlay.flux-manifests.manifests : yamldecode(i)]
+  manifests = [for i in data.kustomization_overlay.flux-manifests.manifests : jsondecode(i)]
 }
 
-resource "kubectl_manifest" "flux" {
-  for_each           = { for i in local.manifests : "${i.kind}_${try(format("%s_", i.metadata.namespace), "")}${i.metadata.name}" => i if i.kind != "Namespace" }
-  override_namespace = kubectl_manifest.flux-namespace.name
-  yaml_body          = yamlencode(each.value)
-  wait_for_rollout   = var.wait
-  wait               = var.wait
+resource "kubernetes_manifest" "flux" {
+  for_each = {
+    for i in local.manifests :
+    "${i.kind}_${try(format("%s_", i.metadata.namespace), "")}${i.metadata.name}" => i if i.kind != "Namespace"
+  }
+
+  manifest = each.value
+
+  computed_fields = ["spec.hard", "spec.template.spec.containers", "metadata.annotations"]
+
+  field_manager {
+    force_conflicts = true
+  }
 }
 
 ###
@@ -129,23 +136,19 @@ locals {
     known_hosts         = trimspace(file(abspath(pathexpand(var.known_hosts_file))))
   }, var.manifests_template_vars)
 
-  git_repository_template = var.git_repo == "" ? "" : abspath(pathexpand(var.git_repository_template))
-  git_repository_data     = var.git_repo == "" ? "" : templatefile(local.git_repository_template, local.manifests_template_vars)
+  git_repository_template = var.git_repo == "" ? null : abspath(pathexpand(var.git_repository_template))
+  git_repository_data     = var.git_repo == "" ? null : provider::kubernetes::manifest_decode_multi(templatefile(local.git_repository_template, local.manifests_template_vars))
 }
 
-data "kubectl_file_documents" "flux-git-repository" {
-  content = local.git_repository_data
-}
+resource "kubernetes_manifest" "flux-git-repository" {
+  depends_on = [kubernetes_manifest.flux]
 
-resource "kubectl_manifest" "flux-git-repository" {
-  depends_on = [kubectl_manifest.flux]
   for_each = {
-    for i in [for j in data.kubectl_file_documents.flux-git-repository.documents : yamldecode(j)] :
+    for i in local.git_repository_data :
     "${i.kind}_${try(format("%s_", i.metadata.namespace), "")}${i.metadata.name}" => i
   }
-  yaml_body        = yamlencode(each.value)
-  wait_for_rollout = var.wait
-  wait             = var.wait
+
+  manifest = each.value
 }
 
 ###
@@ -153,7 +156,7 @@ resource "kubectl_manifest" "flux-git-repository" {
 ###
 
 locals {
-  exclude_set =  fileexists("${path.root}/manifests/exclude-templates.yaml") ? flatten([
+  exclude_set = fileexists("${path.root}/manifests/exclude-templates.yaml") ? flatten([
     for i in yamldecode(file("${path.root}/manifests/exclude-templates.yaml"))
     : fileset("${path.root}/manifests/", i)
   ]) : []
@@ -163,9 +166,8 @@ resource "local_file" "cluster-manifests" {
   for_each = {
     for tpl in fileset("${path.root}/manifests", "**")
     : tpl => templatefile("${path.root}/manifests/${tpl}", var.manifests_template_vars)
-    if (endswith(tpl, ".tpl") && ! contains(local.exclude_set, tpl))
+    if(endswith(tpl, ".tpl") && !contains(local.exclude_set, tpl))
   }
   filename = trimsuffix("${path.root}/manifests/${each.key}", ".tpl")
   content  = each.value
 }
-
