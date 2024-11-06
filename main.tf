@@ -17,7 +17,7 @@ data "kustomization_overlay" "flux-manifests" {
     var.install_on_okd ? abspath(pathexpand("${path.module}/manifests/okd-manifests.yaml")) : ""
   ])
 
-  namespace = kubernetes_namespace_v1.flux-namespace.metadata[0].name
+  namespace = var.namespace
 
   patches {
     target {
@@ -140,15 +140,19 @@ locals {
   git_repository_data     = var.git_repo == "" ? null : provider::kubernetes::manifest_decode_multi(templatefile(local.git_repository_template, local.manifests_template_vars))
 }
 
-resource "kubernetes_manifest" "flux-git-repository" {
-  depends_on = [kubernetes_manifest.flux]
+resource "kubectl_manifest" "flux-git-repository" {
+
+  depends_on = [
+    kubernetes_namespace_v1.flux-namespace,
+    kubernetes_manifest.flux
+  ]
 
   for_each = {
     for i in local.git_repository_data :
     "${i.kind}_${try(format("%s_", i.metadata.namespace), "")}${i.metadata.name}" => i
   }
 
-  manifest = each.value
+  yaml_body = provider::kubernetes::manifest_encode(each.value)
 }
 
 ###

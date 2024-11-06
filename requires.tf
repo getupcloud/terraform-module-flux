@@ -1,9 +1,9 @@
 terraform {
   required_providers {
-    #kubectl = {
-    #  source  = "gavinbunney/kubectl"
-    #  version = "~> 1"
-    #}
+    kubectl = {
+      source  = "alekc/kubectl"
+      version = "~> 2"
+    }
 
     kubernetes = {
       version = "~> 2.33"
