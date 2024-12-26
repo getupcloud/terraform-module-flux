@@ -12,8 +12,8 @@ resource "kubernetes_namespace_v1" "flux-namespace" {
 
   lifecycle {
     ignore_changes = [
-      metadata.annotations["cattle.io/status"],
-      metadata.annotations["lifecycle.cattle.io/create.namespace-auth"]
+      metadata[0].annotations["cattle.io/status"],
+      metadata[0].annotations["lifecycle.cattle.io/create.namespace-auth"]
     ]
   }
 }
