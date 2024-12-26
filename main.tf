@@ -8,13 +8,14 @@ resource "kubernetes_namespace_v1" "flux-namespace" {
     labels = {
       "app.kubernetes.io/instance" = "flux-system"
     }
+  }
 
-    lifecycle {
-      ignore_changes = [
-        metadata.annotations["cattle.io/status"],
-        metadata.annotations["lifecycle.cattle.io/create.namespace-auth"]
-      ]
-    }
+  lifecycle {
+    ignore_changes = [
+      metadata.annotations["cattle.io/status"],
+      metadata.annotations["lifecycle.cattle.io/create.namespace-auth"]
+    ]
+  }
 }
 
 data "kustomization_overlay" "flux-manifests" {
