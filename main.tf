@@ -151,7 +151,7 @@ locals {
 }
 
 resource "kubectl_manifest" "flux-git-repository" {
-
+  wait = true
   depends_on = [
     kubernetes_namespace_v1.flux-namespace,
     kubernetes_manifest.flux
