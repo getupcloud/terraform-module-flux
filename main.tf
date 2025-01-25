@@ -158,7 +158,7 @@ resource "kubectl_manifest" "flux-git-repository" {
   ]
 
   for_each = {
-    for i in local.git_repository_data :
+    for i in nonsensitive(local.git_repository_data) :
     "${i.kind}_${try(format("%s_", i.metadata.namespace), "")}${i.metadata.name}" => i
   }
 
