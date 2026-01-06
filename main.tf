@@ -122,7 +122,14 @@ resource "kubernetes_manifest" "flux" {
 
   manifest = each.value
 
-  computed_fields = ["spec.hard", "spec.template.spec.containers", "metadata.annotations"]
+  computed_fields = [
+    "metadata.annotations",
+    "metadata.labels",
+    "spec.template.metadata.annotations",
+    "spec.template.metadata.labels",
+    "spec.template.spec.containers",
+    "spec.hard"
+  ]
 
   field_manager {
     force_conflicts = true
